@@ -8,7 +8,7 @@
 
 int main(void)
 {
-    size_t size = 1UL << 30;   // 1 GiB
+    size_t size = 2UL << 30;   // 1 GiB
 
     void *p = mmap(NULL, size,
                    PROT_READ | PROT_WRITE,
