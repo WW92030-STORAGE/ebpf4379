@@ -12,10 +12,10 @@ int main(void)
     const unsigned long SIZE = 2UL * G;  // map 2GB
 
     // Request mapping
-    void *p = mmap(NULL, SIZE,
-                   PROT_READ | PROT_WRITE,
-                   MAP_PRIVATE | MAP_ANONYMOUS,
-                   -1, 0);
+    void *p = mmap((void*)0x100000000ULL, SIZE,
+               PROT_READ | PROT_WRITE,
+               MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED_NOREPLACE,
+               -1, 0);
 
     if (p == MAP_FAILED) {
         perror("mmap");
