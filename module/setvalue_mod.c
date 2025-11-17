@@ -58,4 +58,3 @@ module_exit(setvalue_exit);
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("you");
 MODULE_DESCRIPTION("Expose SET_VALUE via /proc/set_shared_value");
-
