@@ -45,7 +45,7 @@ def framem(FRAMEM_RUIN = 5):
 if __name__ == "__main__":
     WARMUP_CNT = 4
     TEST_CNT = 32
-    RUIN = 10
+    RUIN = 80
 
     ELAPSED_NS = 0
 

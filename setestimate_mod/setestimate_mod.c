@@ -10,7 +10,7 @@
 /* Declare the real kernel function you already have.
  * It must be exported or have a visible symbol in kallsyms.
  */
-extern void SET_DO_PMD_ESTIMATE(bool val);
+extern void SET_DO_PMD_ESTIMATE(u64 val);
 
 static ssize_t proc_write(struct file *file,
                           const char __user *ubuf,
@@ -35,7 +35,7 @@ static ssize_t proc_write(struct file *file,
     }
 
     /* Call into your kernel code */
-    SET_DO_PMD_ESTIMATE(val != 0);
+    SET_DO_PMD_ESTIMATE(val);
 
     pr_info("set_estimate: SET_DO_PMD_ESTIMATE(%llu)\n", val);
 
