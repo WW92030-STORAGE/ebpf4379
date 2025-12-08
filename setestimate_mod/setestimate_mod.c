@@ -4,13 +4,13 @@
 #include <linux/proc_fs.h>
 #include <linux/uaccess.h>
 
-#define PROC_NAME "set_benefits"
+#define PROC_NAME "set_estimate"
 #define BUFSIZE 64
 
 /* Declare the real kernel function you already have.
  * It must be exported or have a visible symbol in kallsyms.
  */
-extern void SET_BENEFITS(u64 index, u64 val);
+extern void SET_DO_PMD_ESTIMATE(bool val);
 
 static ssize_t proc_write(struct file *file,
                           const char __user *ubuf,
@@ -18,7 +18,7 @@ static ssize_t proc_write(struct file *file,
                           loff_t *ppos)
 {
     char buf[BUFSIZE];
-    u64 index, val;
+    u64 val;
 
     if (count >= BUFSIZE)
         return -EINVAL;
@@ -29,15 +29,15 @@ static ssize_t proc_write(struct file *file,
     buf[count] = '\0';
 
     /* Expect: "index value" */
-    if (sscanf(buf, "%llu %llu", &index, &val) != 2) {
-        pr_info("set_benefits: expected \"<index> <value>\"\n");
+    if (sscanf(buf, "%llu", &val) != 1) {
+        pr_info("set_estimate: expected \"<value>\"\n");
         return -EINVAL;
     }
 
     /* Call into your kernel code */
-    SET_BENEFITS(index, val);
+    SET_DO_PMD_ESTIMATE(val != 0);
 
-    pr_info("set_benefits: SET_BENEFITS(%llu, %llu)\n", index, val);
+    pr_info("set_estimate: SET_DO_PMD_ESTIMATE(%llu)\n", val);
 
     return count;
 }
@@ -49,14 +49,14 @@ static const struct proc_ops proc_fops = {
 static int __init set_benefits_init(void)
 {
     proc_create(PROC_NAME, 0222, NULL, &proc_fops);
-    pr_info("set_benefits_mod loaded\n");
+    pr_info("set_estimate_mod loaded\n");
     return 0;
 }
 
 static void __exit set_benefits_exit(void)
 {
     remove_proc_entry(PROC_NAME, NULL);
-    pr_info("set_benefits_mod unloaded\n");
+    pr_info("set_estimate_mod unloaded\n");
 }
 
 module_init(set_benefits_init);
@@ -64,4 +64,4 @@ module_exit(set_benefits_exit);
 
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("you");
-MODULE_DESCRIPTION("Expose SET_BENEFITS(index, value) via /proc/set_benefits");
+MODULE_DESCRIPTION("Expose SET_DO_PMD_ESTIMATE(value) via /proc/set_estimate");

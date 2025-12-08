@@ -166,5 +166,5 @@ int main(int argc, char* argv[]) {
     //ret = daemon(0, 0);
     //ERROR_RETURN(pid, "daemonize");
 
-    while(1) sleep(10000);
+    // while(1) sleep(10000);
 }
