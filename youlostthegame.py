@@ -44,17 +44,20 @@ def framem(FRAMEM_RUIN = 5):
 
 if __name__ == "__main__":
     WARMUP_CNT = 4
-    TEST_CNT = 32
+    TEST_CNT = 128
     RUIN = 80
 
     ELAPSED_NS = 0
+    DATA = []
 
     for i in range(WARMUP_CNT):
         framem(RUIN)
         time.sleep(1)
 
     for i in range(TEST_CNT):
-        ELAPSED_NS += framem(RUIN)
+        value = framem(RUIN)
+        ELAPSED_NS += value
+        DATA.append(value)
         print(str(i + 1) + "/" + str(TEST_CNT) + " DONE...")
         time.sleep(1)
 
@@ -64,3 +67,14 @@ if __name__ == "__main__":
     print("AVG ELAPSED: " + str(ELAPSED_NS) + "ns")
     print("AVG ELAPSED: " + str(ELAPSED_NS * 0.001) + "us")
     print("AVG ELAPSED: " + str(ELAPSED_NS * 0.001 * 0.001) + "ms")
+    print("DATA", str(DATA))
+    for data in DATA:
+        print(data)
+
+    with open("test_results.dat" ,"w") as FF:
+        FF.write("AVG ELAPSED: " + str(ELAPSED_NS) + "ns" + "\n")
+        FF.write("AVG ELAPSED: " + str(ELAPSED_NS * 0.001) + "us" + "\n")
+        FF.write("AVG ELAPSED: " + str(ELAPSED_NS * 0.001 * 0.001) + "ms" + "\n")
+        FF.write("DATA" + str(DATA) + "\n")
+        for data in DATA:
+            FF.write(str(data) + "\n")

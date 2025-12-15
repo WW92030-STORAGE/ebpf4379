@@ -7,3 +7,6 @@ clean:
 # sudo insmod setestimate_mod.ko
 # echo 0 | sudo tee /proc/set_estimate 
 # echo 1 | sudo tee /proc/set_estimate 
+# echo 2 | sudo tee /proc/set_estimate 
+
+# 0 never 1 sometimes 2 always
