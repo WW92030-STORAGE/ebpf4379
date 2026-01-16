@@ -22,7 +22,7 @@ __used __section("__versions") = {
 	{ 0x88db9f48, "__check_object_size" },
 	{ 0x13c49cc2, "_copy_from_user" },
 	{ 0xbcab6ee6, "sscanf" },
-	{ 0xef206eca, "SET_DO_PMD_ESTIMATE" },
+	{ 0xe6444e76, "SET_BENEFITS" },
 	{ 0x87a21cb3, "__ubsan_handle_out_of_bounds" },
 	{ 0xf0fdf6cb, "__stack_chk_fail" },
 	{ 0x939bb514, "remove_proc_entry" },
@@ -35,4 +35,4 @@ __used __section("__versions") = {
 MODULE_INFO(depends, "");
 
 
-MODULE_INFO(srcversion, "A8FD17DB8E9EC7E24A7095C");
+MODULE_INFO(srcversion, "B3304CB6A1C8BC041C8EEDE");

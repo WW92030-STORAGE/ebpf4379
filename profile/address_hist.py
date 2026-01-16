@@ -8,8 +8,9 @@ Address histogram. Intermittently, it procures a histogram of address ranges tha
 """
 
 # choose a sane number of buckets
-NUM_BUCKETS = 64  
-BUCKET_SHIFT = 28     # 16MB (2^??? * 2^20) buckets.
+BUCKET_ORDER = 6                    # Log of how many buckets there are 
+BUCKET_SHIFT = 48 - BUCKET_ORDER    # Log of how big each bucket is
+NUM_BUCKETS = 1 << BUCKET_ORDER  
 BUCKET_SIZE = 1 << BUCKET_SHIFT   # how big the bucket is, in terms of powers of 2 of the bucket size
 
 prog = """
@@ -19,6 +20,7 @@ BPF_ARRAY(addr_hist, u64, """ + str(NUM_BUCKETS) + """);
 
 int probe_handle_mm_fault(struct pt_regs *ctx)
 {
+    
     unsigned long addr = PT_REGS_PARM2(ctx);
     u64 bucket = addr >> """ + str(BUCKET_SHIFT) + """;
 
@@ -50,9 +52,9 @@ def print_linear_hist():
             continue
 
         start = i.value * BUCKET_SIZE
-        end = start + BUCKET_SIZE
+        end = start + BUCKET_SIZE - 1
 
-        print("%#014x - %#014x : %d" % (start, end, count))
+        print("%#16x - %#16x : %d" % (start, end, count))
 
         res.append((start, end, count))
     arr.clear()
@@ -64,5 +66,4 @@ if __name__ == "__main__":
     while True:
         sleep(4)
         val = print_linear_hist()
-        print(val)
 
