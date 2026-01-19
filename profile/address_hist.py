@@ -67,3 +67,4 @@ if __name__ == "__main__":
         sleep(4)
         val = print_linear_hist()
 
+        print(val)
