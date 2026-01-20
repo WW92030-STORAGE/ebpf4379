@@ -2,8 +2,7 @@ import subprocess
 
 VA_ORDER = 48       # How many bits does the address space occupy?
 
-def exec_(cmd):
-    subprocess.run(cmd, shell = True)
+from execute import exec_
 
 # Init a profile with evenly spread ranges and default benefit. 
 def set_all_zeros(BUCKET_ORDER = 6, benefit = 2000001):

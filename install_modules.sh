@@ -35,5 +35,11 @@ make
 sudo insmod forceinit_mod.ko
 make clean
 
+# /proc/increase_benefits
+cd ../incbenefits_mod
+make
+sudo insmod incbenefits_mod.ko
+make clean
+
 
 # echo ? ? | sudo tee /proc/set_???

@@ -1,6 +1,8 @@
 from bcc import BPF
 from time import sleep
 
+from execute import exec_
+
 """
 
 Address histogram. Intermittently, it procures a histogram of address ranges that were affected the most. 
@@ -61,10 +63,31 @@ def print_linear_hist():
 
     return res
 
+def get_bucket_info(val):
+    res = [0] * 64
+    for input in val:
+        bucket_index = input[0] >> BUCKET_SHIFT
+        print(input, bucket_index)
+
+        res[bucket_index] = input[2]
+    return res
 
 if __name__ == "__main__":
     while True:
         sleep(4)
         val = print_linear_hist()
 
-        print(val)
+        bucket_info = get_bucket_info(val)
+
+        count = sum(x != 0 for x in bucket_info)
+        if count:
+            mu = sum(bucket_info) / count
+            for index in range(len(bucket_info)):
+                if bucket_info[index] > mu:
+                    cmd = "echo \"%d %d\" | sudo tee /proc/set_benefits" % (i, 4000000)
+                    exec_(cmd)
+                elif bucket_info[index] < mu:
+                    cmd = "echo \"%d %d\" | sudo tee /proc/set_benefits" % (i, 1000000)
+                    exec_(cmd)
+
+
