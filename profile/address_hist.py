@@ -43,7 +43,7 @@ b.attach_kprobe(event="handle_mm_fault", fn_name="probe_handle_mm_fault")
 print("Tracing... Ctrl-C to stop.")
 
 def print_linear_hist():
-    print("---- Linear VA Fault Histogram ----")
+    # print("---- Linear VA Fault Histogram ----")
     arr = b.get_table("addr_hist")
 
     res = []
@@ -56,7 +56,7 @@ def print_linear_hist():
         start = i.value * BUCKET_SIZE
         end = start + BUCKET_SIZE - 1
 
-        print("%#16x - %#16x : %d" % (start, end, count))
+        # print("%#16x - %#16x : %d" % (start, end, count))
 
         res.append((start, end, count))
     arr.clear()
@@ -67,7 +67,6 @@ def get_bucket_info(val):
     res = [0] * 64
     for input in val:
         bucket_index = input[0] >> BUCKET_SHIFT
-        print(input, bucket_index)
 
         res[bucket_index] = input[2]
     return res
@@ -84,10 +83,12 @@ if __name__ == "__main__":
             mu = sum(bucket_info) / count
             for index in range(len(bucket_info)):
                 if bucket_info[index] > mu:
-                    cmd = "echo \"%d %d\" | sudo tee /proc/set_benefits" % (i, 4000000)
+                    cmd = "echo \"%d %d\" | sudo tee /proc/set_benefits" % (index, 400000)
                     exec_(cmd)
                 elif bucket_info[index] < mu:
-                    cmd = "echo \"%d %d\" | sudo tee /proc/set_benefits" % (i, 1000000)
+                    cmd = "echo \"%d %d\" | sudo tee /proc/set_benefits" % (index, 100000)
                     exec_(cmd)
+        
+        print("PERIOD HIT")
 
 
