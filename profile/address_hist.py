@@ -9,11 +9,7 @@ Address histogram. Intermittently, it procures a histogram of address ranges tha
 
 """
 
-# choose a sane number of buckets
-BUCKET_ORDER = 6                    # Log of how many buckets there are 
-BUCKET_SHIFT = 48 - BUCKET_ORDER    # Log of how big each bucket is
-NUM_BUCKETS = 1 << BUCKET_ORDER  
-BUCKET_SIZE = 1 << BUCKET_SHIFT   # how big the bucket is, in terms of powers of 2 of the bucket size
+from CONSTANTS import BUCKET_ORDER, BUCKET_SHIFT, BUCKET_SIZE, NUM_BUCKETS
 
 prog = """
 #include <uapi/linux/ptrace.h>
@@ -64,7 +60,7 @@ def print_linear_hist():
     return res
 
 def get_bucket_info(val):
-    res = [0] * 64
+    res = [0] * NUM_BUCKETS
     for input in val:
         bucket_index = input[0] >> BUCKET_SHIFT
 
@@ -82,7 +78,9 @@ if __name__ == "__main__":
         if count:
             mu = sum(bucket_info) / count
             for index in range(len(bucket_info)):
-                if bucket_info[index] > mu:
+                if bucket_info[index] == 0:
+                    continue
+                elif bucket_info[index] > mu:
                     cmd = "echo \"%d %d\" | sudo tee /proc/set_benefits" % (index, 400000)
                     exec_(cmd)
                 elif bucket_info[index] < mu:

@@ -3,9 +3,10 @@ import subprocess
 VA_ORDER = 48       # How many bits does the address space occupy?
 
 from execute import exec_
+import CONSTANTS
 
 # Init a profile with evenly spread ranges and default benefit. 
-def set_all_zeros(BUCKET_ORDER = 6, benefit = 200001):
+def set_all_zeros(BUCKET_ORDER = CONSTANTS.BUCKET_ORDER, benefit = 200001):
     # BUCKET_ORDER is the log of how many buckets there are.
     BUCKET_SHIFT = 48 - BUCKET_ORDER    # Log of how big each bucket is
     NUM_BUCKETS = 1 << BUCKET_ORDER  
