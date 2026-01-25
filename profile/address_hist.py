@@ -6,6 +6,7 @@ from execute import exec_
 """
 
 Address histogram. Intermittently, it procures a histogram of address ranges that were affected the most. 
+Look into accesses as well?
 
 """
 
@@ -86,7 +87,5 @@ if __name__ == "__main__":
                 elif bucket_info[index] < mu:
                     cmd = "echo \"%d %d\" | sudo tee /proc/set_benefits" % (index, 100000)
                     exec_(cmd)
-        
-        print("PERIOD HIT")
 
 
