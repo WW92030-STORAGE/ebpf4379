@@ -29,7 +29,7 @@ static ssize_t proc_write(struct file *file,
     buf[count] = '\0';
 
     /* Expect: "index value" */
-    if (sscanf(buf, "%llu %llu, %llu", &index, &val, &POS) != 3) {
+    if (sscanf(buf, "%llu %llu %llu", &index, &val, &POS) != 3) {
         pr_info("increase_benefits: expected \"<index> <value> <positive>\"\n");
         return -EINVAL;
     }

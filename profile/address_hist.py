@@ -2,6 +2,7 @@ from bcc import BPF
 from time import sleep
 
 from execute import exec_
+import random
 
 """
 
@@ -11,6 +12,7 @@ Look into accesses as well?
 """
 
 from CONSTANTS import BUCKET_ORDER, BUCKET_SHIFT, BUCKET_SIZE, NUM_BUCKETS
+from UTILS import get_benefits
 
 prog = """
 #include <uapi/linux/ptrace.h>
@@ -69,8 +71,13 @@ def get_bucket_info(val):
     return res
 
 if __name__ == "__main__":
+    PERIOD = 32
+    FIXED_VALUES = False
+    TRADE_VALUE = 5000
+    UB = 400000 - 20000
+    LB = 20000
     while True:
-        sleep(4)
+        sleep(PERIOD)
         val = print_linear_hist()
 
         bucket_info = get_bucket_info(val)
@@ -78,14 +85,43 @@ if __name__ == "__main__":
         count = sum(x != 0 for x in bucket_info)
         if count:
             mu = sum(bucket_info) / count
-            for index in range(len(bucket_info)):
-                if bucket_info[index] == 0:
-                    continue
-                elif bucket_info[index] > mu:
-                    cmd = "echo \"%d %d\" | sudo tee /proc/set_benefits" % (index, 400000)
-                    exec_(cmd)
-                elif bucket_info[index] < mu:
-                    cmd = "echo \"%d %d\" | sudo tee /proc/set_benefits" % (index, 100000)
-                    exec_(cmd)
+            if FIXED_VALUES:
+                for index in range(len(bucket_info)):
+                    if bucket_info[index] == 0:
+                        continue
+                    elif bucket_info[index] > mu:
+                        cmd = "echo \"%d %d\" | sudo tee /proc/set_benefits" % (index, 400000)
+                        exec_(cmd)
+                    elif bucket_info[index] < mu:
+                        cmd = "echo \"%d %d\" | sudo tee /proc/set_benefits" % (index, 100000)
+                        exec_(cmd)
+            else:
+
+                sum_below_avg = 1
+                sum_above_avg = 1
+                for index in range(NUM_BUCKETS):
+                    deviation = abs(bucket_info[index] - mu)
+                    if bucket_info[index] == 0:
+                        continue
+                    elif bucket_info[index] > mu:
+                        sum_above_avg += deviation
+                    elif bucket_info[index] < mu:
+                        sum_below_avg += deviation
+                    
+                for index in range(NUM_BUCKETS):
+                    deviation = abs(bucket_info[index] - mu)
+                    if bucket_info[index] == 0:
+                        continue
+                    cur_ben = get_benefits(index)
+                    if bucket_info[index] > mu:
+                        if cur_ben > UB:
+                            continue
+                        cmd = "echo \"%d %d %d\" | sudo tee /proc/increase_benefits" % (index, (TRADE_VALUE * deviation) // sum_above_avg, 1)
+                        exec_(cmd)
+                    elif bucket_info[index] < mu:
+                        if cur_ben < UB:
+                            continue
+                        cmd = "echo \"%d %d %d\" | sudo tee /proc/increase_benefits" % (index, (TRADE_VALUE * deviation) // sum_below_avg, 0)
+                        exec_(cmd)
 
 

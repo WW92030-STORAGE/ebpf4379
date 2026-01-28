@@ -41,5 +41,11 @@ make
 sudo insmod incbenefits_mod.ko
 make clean
 
+# /proc/get_benefits
+cd ../getbenefits_mod
+make
+sudo insmod getbenefits_mod.ko
+make clean
+
 
 # echo ? ? | sudo tee /proc/set_???
