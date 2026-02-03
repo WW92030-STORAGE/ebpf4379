@@ -1,3 +1,6 @@
 [submodule "mongo"]
 	path = mongo
 	url = https://github.com/mongodb/mongo.git
+[submodule "cbmm-runner"]
+	path = cbmm-runner
+	url = https://github.com/multifacet/cbmm-runner.git
