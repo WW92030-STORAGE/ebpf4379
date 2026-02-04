@@ -5,6 +5,7 @@ from execute import exec_
 import random
 
 import concurrent.futures as CF
+import time
 
 """
 
@@ -84,6 +85,8 @@ if __name__ == "__main__":
         sleep(PERIOD)
         val = print_linear_hist()
 
+        START = time.perf_counter_ns()
+
         bucket_info = get_bucket_info(val)
         count = sum(x != 0 for x in bucket_info)
         if count:
@@ -147,5 +150,11 @@ if __name__ == "__main__":
                     with CF.ThreadPoolExecutor(max_workers=NUM_THREADS) as executor:
                         for i in range(NUM_THREADS):
                             executor.submit(partial_mod, i, NUM_THREADS)
+        END = time.perf_counter_ns()
+
+        ELAPSED_NS = END - START
+
+        print("MS:", ELAPSED_NS * 0.000001)
+
 
 
