@@ -4,6 +4,8 @@ from time import sleep
 from execute import exec_
 import random
 
+import concurrent.futures as CF
+
 """
 
 Address histogram. Intermittently, it procures a histogram of address ranges that were affected the most. 
@@ -71,8 +73,10 @@ def get_bucket_info(val):
     return res
 
 if __name__ == "__main__":
-    PERIOD = 32
+    PERIOD = 8
     FIXED_VALUES = False
+    PARALLEL = True
+    NUM_THREADS = 8
     TRADE_VALUE = 5000
     UB = 400000 - 20000
     LB = 20000
@@ -81,7 +85,6 @@ if __name__ == "__main__":
         val = print_linear_hist()
 
         bucket_info = get_bucket_info(val)
-
         count = sum(x != 0 for x in bucket_info)
         if count:
             mu = sum(bucket_info) / count
@@ -107,21 +110,42 @@ if __name__ == "__main__":
                         sum_above_avg += deviation
                     elif bucket_info[index] < mu:
                         sum_below_avg += deviation
-                    
-                for index in range(NUM_BUCKETS):
-                    deviation = abs(bucket_info[index] - mu)
-                    if bucket_info[index] == 0:
-                        continue
-                    cur_ben = get_benefits(index)
-                    if bucket_info[index] > mu:
-                        if cur_ben > UB:
+                
+                def partial_mod(start_val, step):
+                    for index in range(start_val, NUM_BUCKETS, step):
+                        deviation = abs(bucket_info[index] - mu)
+                        if bucket_info[index] == 0:
                             continue
-                        cmd = "echo \"%d %d %d\" | sudo tee /proc/increase_benefits" % (index, (TRADE_VALUE * deviation) // sum_above_avg, 1)
-                        exec_(cmd)
-                    elif bucket_info[index] < mu:
-                        if cur_ben < UB:
+                        cur_ben = get_benefits(index)
+                        if bucket_info[index] > mu:
+                            if cur_ben > UB:
+                                continue
+                            cmd = "echo \"%d %d %d\" | sudo tee /proc/increase_benefits" % (index, (TRADE_VALUE * deviation) // sum_above_avg, 1)
+                            exec_(cmd)
+                        elif bucket_info[index] < mu:
+                            if cur_ben < UB:
+                                continue
+                            cmd = "echo \"%d %d %d\" | sudo tee /proc/increase_benefits" % (index, (TRADE_VALUE * deviation) // sum_below_avg, 0)
+                            exec_(cmd)
+                if not PARALLEL:
+                    for index in range(NUM_BUCKETS):
+                        deviation = abs(bucket_info[index] - mu)
+                        if bucket_info[index] == 0:
                             continue
-                        cmd = "echo \"%d %d %d\" | sudo tee /proc/increase_benefits" % (index, (TRADE_VALUE * deviation) // sum_below_avg, 0)
-                        exec_(cmd)
+                        cur_ben = get_benefits(index)
+                        if bucket_info[index] > mu:
+                            if cur_ben > UB:
+                                continue
+                            cmd = "echo \"%d %d %d\" | sudo tee /proc/increase_benefits" % (index, (TRADE_VALUE * deviation) // sum_above_avg, 1)
+                            exec_(cmd)
+                        elif bucket_info[index] < mu:
+                            if cur_ben < UB:
+                                continue
+                            cmd = "echo \"%d %d %d\" | sudo tee /proc/increase_benefits" % (index, (TRADE_VALUE * deviation) // sum_below_avg, 0)
+                            exec_(cmd)
+                else:
+                    with CF.ThreadPoolExecutor(max_workers=NUM_THREADS) as executor:
+                        for i in range(NUM_THREADS):
+                            executor.submit(partial_mod, i, NUM_THREADS)
 
 

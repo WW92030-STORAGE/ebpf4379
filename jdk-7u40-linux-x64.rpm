@@ -1,0 +1,6 @@
+--2026-02-03 13:44:34--  http://download.oracle.com/otn-pub/java/jdk/7u40-b43/jdk-7u40-linux-x64.rpm?AuthParam=11232426132
+Resolving download.oracle.com (download.oracle.com)... 23.202.0.81
+Connecting to download.oracle.com (download.oracle.com)|23.202.0.81|:80... connected.
+HTTP request sent, awaiting response... 403 Forbidden
+2026-02-03 13:44:34 ERROR 403: Forbidden.
+
