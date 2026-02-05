@@ -95,10 +95,8 @@ if __name__ == "__main__":
     PERIOD = 8
     FIXED_VALUES = False
     PARALLEL = True
-    NUM_THREADS = 16
+    NUM_THREADS = 4
     TRADE_VALUE = 5000
-    UB = 400000 - 20000
-    LB = 20000
     while True:
         sleep(PERIOD)
 
@@ -149,20 +147,12 @@ if __name__ == "__main__":
                         transfer = (TRADE_VALUE * deviation) // sum_above_avg
                         if bucket_info[index] == 0:
                             continue
-                        SB = time.perf_counter_ns()
-                        cur_ben = get_benefits(index)
-                        EB = time.perf_counter_ns()
-                        print("GET MS: " + str((EB - SB) * 0.000001))
                         if bucket_info[index] + transfer > mu:
-                            if cur_ben + transfer <= UB:
-                                cmd = "echo \"%d %d %d\" | sudo tee /proc/increase_benefits" % (index, transfer, 1)
-                                exec_(cmd)
+                            cmd = "echo \"%d %d %d\" | sudo tee /proc/increase_benefits" % (index, transfer, 1)
+                            exec_(cmd)
                         elif bucket_info[index] < mu:
-                            if cur_ben - transfer >= LB:
-                                cmd = "echo \"%d %d %d\" | sudo tee /proc/increase_benefits" % (index, transfer, 0)
-                                exec_(cmd)
-                        EB = time.perf_counter_ns()
-                        print("PUT MS: " + str((EB - SB) * 0.000001))
+                            cmd = "echo \"%d %d %d\" | sudo tee /proc/increase_benefits" % (index, transfer, 0)
+                            exec_(cmd)
                 if not PARALLEL:
                     modify_worker(0, 1)
                 else:
