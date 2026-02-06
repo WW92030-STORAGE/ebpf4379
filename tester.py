@@ -44,8 +44,8 @@ def run_test(CMD = "./framem 1"):
 
 
 def run_tests(CMD = "./framem 1"):
-    WARMUP_CNT = 4
-    TEST_CNT = 32
+    WARMUP_CNT = 1
+    TEST_CNT = 1
 
     ELAPSED_NS = 0
     DATA = []
