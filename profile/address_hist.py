@@ -7,6 +7,7 @@ import random
 import concurrent.futures as CF
 import time
 
+
 """
 
 Address histogram. Intermittently, it procures a histogram of address ranges that were affected the most. 
@@ -16,6 +17,7 @@ Look into accesses as well?
 
 from CONSTANTS import BUCKET_ORDER, BUCKET_SHIFT, BUCKET_SIZE, NUM_BUCKETS
 from UTILS import get_benefits
+import UTILS
 
 # Actual eBPF system that procure the histogram
 
@@ -106,6 +108,8 @@ if __name__ == "__main__":
         val = print_linear_hist()
         bucket_info = get_bucket_info(val)
 
+
+
         # Count (baseline for averages)
         count = sum(x != 0 for x in bucket_info)
 
@@ -159,6 +163,18 @@ if __name__ == "__main__":
                     with CF.ThreadPoolExecutor(max_workers=NUM_THREADS) as executor:
                         for i in range(NUM_THREADS):
                             executor.submit(modify_worker, i, NUM_THREADS)
+
+        # Compute trends i guess
+
+        if prior_histogram is not None:
+            cosine = UTILS.cosine_sim(bucket_info, prior_histogram)
+            print("COSINE SIM", cosine)
+
+            emd_Score = UTILS.emd(bucket_info, prior_histogram)
+            print("EMD", emd_Score)
+
+        prior_histogram = bucket_info
+
         
         END = time.perf_counter_ns()
         ELAPSED_NS = END - START

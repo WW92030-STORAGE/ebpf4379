@@ -1,7 +1,7 @@
 #!/bin/bash
 
-NTHREADS=2
-NDOCS=131072
+NTHREADS=16
+NDOCS=1048576
 
 cd mongodb-benchmarking
 
