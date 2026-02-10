@@ -62,7 +62,7 @@ int probe_create_huge_pmd(struct pt_regs *ctx)
 """
 
 promo_b = BPF(text=promotion_histogram_program)
-promo_b.attach_kprobe(event="create_huge_pmd", fn_name="probe_create_huge_pmd")
+promo_b.attach_kprobe(event="do_huge_pmd_anonymous_page", fn_name="probe_create_huge_pmd")
 
 # Procure and return the histograms
 def print_linear_hist(clear_hist = True):

@@ -9,7 +9,7 @@ bpf_program = r"""
 int probe_create_huge_pmd(struct pt_regs *ctx)
 {
     struct vm_fault *vmf;
-    unsigned long addr = 0;
+    unsigned long addr = 1;
 
     /* First argument: struct vm_fault *vmf */
     vmf = (struct vm_fault *)PT_REGS_PARM1(ctx);
@@ -26,7 +26,7 @@ b = BPF(text=bpf_program)
 
 # Attach kprobe
 b.attach_kprobe(
-    event="create_huge_pmd",
+    event="do_huge_pmd_anonymous_page",
     fn_name="probe_create_huge_pmd"
 )
 
