@@ -1,0 +1,10 @@
+void init_values(void) {
+	if (HAS_INIT) return;
+	else HAS_INIT = true;
+	printk("INIT VALUES\n");
+
+	STARTS[0] = 0x0;
+	ENDS[0] = 0x556816c00000;
+	BENEFITS[0] = 21531397;
+	PROFILE_SIZE = 1;
+}

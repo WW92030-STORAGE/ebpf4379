@@ -1,6 +1,6 @@
 
 
-CSV = "xz-training-just-huge"
+CSV = "mongodb-just-huge"
 
 def read_csv(csv = CSV):
     indent = "\t"

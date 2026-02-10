@@ -19,69 +19,7 @@ from CONSTANTS import BUCKET_ORDER, BUCKET_SHIFT, BUCKET_SIZE, NUM_BUCKETS
 from UTILS import get_benefits
 import UTILS
 
-# Actual eBPF system that procure the histogram
-
-prog = """
-#include <uapi/linux/ptrace.h>
-
-BPF_ARRAY(addr_hist, u64, """ + str(NUM_BUCKETS) + """);
-
-int probe_handle_mm_fault(struct pt_regs *ctx)
-{
-    
-    unsigned long addr = PT_REGS_PARM2(ctx);
-    u64 bucket = addr >> """ + str(BUCKET_SHIFT) + """;
-
-    if (bucket >= """ + str(NUM_BUCKETS) + """)
-        bucket = """ + str(NUM_BUCKETS) + """ - 1;   // clamp
-
-    u64 *val = addr_hist.lookup(&bucket);
-    if (val)
-        __sync_fetch_and_add(val, 1);
-
-    return 0;
-}
-"""
-
-b = BPF(text=prog)
-b.attach_kprobe(event="handle_mm_fault", fn_name="probe_handle_mm_fault")
-
-print("Tracing... Ctrl-C to stop.")
-
-# Procure and return the histogram
-def print_linear_hist():
-    # print("---- Linear VA Fault Histogram ----")
-    arr = b.get_table("addr_hist")
-
-    res = []
-
-    for i, v in arr.items():
-        count = v.value
-        if count == 0:
-            continue
-
-        start = i.value * BUCKET_SIZE
-        end = start + BUCKET_SIZE - 1
-
-        # print("%#16x - %#16x : %d" % (start, end, count))
-
-        res.append((start, end, count))
-    arr.clear()
-
-    return res
-
-# Convert the histogram, (start, end, count), into a flat histogram with implicitly defined ranges as indices.
-def get_bucket_info(val):
-    res = [0] * NUM_BUCKETS
-    for input in val:
-        bucket_index = input[0] >> BUCKET_SHIFT
-
-        res[bucket_index] = input[2]
-    return res
-
-# Constants and globals
-
-prior_histogram = None
+import histograms as hists
 
 # Runner -- periodically procure a histogram and do updates
 if __name__ == "__main__":
@@ -94,19 +32,19 @@ if __name__ == "__main__":
     UB/LB - Attempts to change benefits to outside this range are ignored.
 
     """
-    PERIOD = 8
+    PERIOD = 16
     FIXED_VALUES = False
     PARALLEL = True
     NUM_THREADS = 4
-    TRADE_VALUE = 5000
+    TRADE_VALUE = 10000
     while True:
         sleep(PERIOD)
 
         START = time.perf_counter_ns()
 
         # Convert the histogram
-        val = print_linear_hist()
-        bucket_info = get_bucket_info(val)
+        val = hists.print_linear_hist()
+        bucket_info = hists.get_bucket_info(val)
 
 
 
@@ -166,14 +104,14 @@ if __name__ == "__main__":
 
         # Compute trends i guess
 
-        if prior_histogram is not None:
-            cosine = UTILS.cosine_sim(bucket_info, prior_histogram)
+        if hists.prior_transition_array is not None:
+            cosine = UTILS.cosine_sim(bucket_info, hists.prior_transition_array)
             print("COSINE SIM", cosine)
 
-            emd_Score = UTILS.emd(bucket_info, prior_histogram)
+            emd_Score = UTILS.emd(bucket_info, hists.prior_transition_array)
             print("EMD", emd_Score)
 
-        prior_histogram = bucket_info
+        hists.prior_transition_array = bucket_info
 
         
         END = time.perf_counter_ns()
@@ -182,3 +120,35 @@ if __name__ == "__main__":
 
 
 
+"""
+
+If a certain page is below the average but all are very high
+We could include zero hit pages?
+We could split this between 0 and nonzero pages
+
+DS's proposal: 
+
+Instead of comparing benefits, think of if a page should have been promoted
+Use the new histogram to evaluate the decisions made on a page. If a page was promoted previously, its access count should be higher.
+
+Loop (every period):
+
+1. Compute the histogram
+2. Compute a uhh transition array. This represents how the promoted page regions change e.g. benefit changes, boolean whatevers, etc.
+3. Use the histogram, and analyze the previous transition array instead of the previous histogram.
+
+Use absolute thresholds e.g. the page regions hould have 100 or soaccesses in teh last preiod (or i guess per second)
+
+
+
+"""
+
+
+
+
+"""
+
+Known guardrail strategies
+- Increase/benefit benefits based on above/below average number of region hits (does not work for mongodb)
+
+"""

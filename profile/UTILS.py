@@ -40,6 +40,7 @@ def emd(a, b):
     sb = sum(b)
     if sa != 0:
         a = [i / sa for i in a]
+    if sb != 0:
         b = [i / sb for i in b]
     
     emd = 0

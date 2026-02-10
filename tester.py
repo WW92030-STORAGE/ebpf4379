@@ -59,6 +59,8 @@ def run_tests(CMD = "./framem 1"):
         ELAPSED_NS += value
         DATA.append(value)
         print(str(i + 1) + "/" + str(TEST_CNT) + " DONE...")
+        if len(DATA):
+            print("RUNNING AVERAGE:", sum(DATA) / len(DATA) * 0.001)
         time.sleep(1)
 
     ELAPSED_NS /= TEST_CNT
