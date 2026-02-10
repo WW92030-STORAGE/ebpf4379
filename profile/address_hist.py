@@ -43,7 +43,7 @@ if __name__ == "__main__":
         START = time.perf_counter_ns()
 
         # Convert the histogram
-        val = hists.print_linear_hist()
+        val = hists.print_linear_hist()[0]
         bucket_info = hists.get_bucket_info(val)
 
 

@@ -7,81 +7,7 @@ import random
 import concurrent.futures as CF
 import time
 
-
-"""
-
-Address histogram. Intermittently, it procures a histogram of address ranges that were affected the most. 
-Look into accesses as well?
-
-"""
-
-from CONSTANTS import BUCKET_ORDER, BUCKET_SHIFT, BUCKET_SIZE, NUM_BUCKETS
-from UTILS import get_benefits
-import UTILS
-
-# Actual eBPF system that procure the histogram
-
-prog = """
-#include <uapi/linux/ptrace.h>
-
-BPF_ARRAY(addr_hist, u64, """ + str(NUM_BUCKETS) + """);
-
-int probe_handle_mm_fault(struct pt_regs *ctx)
-{
-    
-    unsigned long addr = PT_REGS_PARM2(ctx);
-    u64 bucket = addr >> """ + str(BUCKET_SHIFT) + """;
-
-    if (bucket >= """ + str(NUM_BUCKETS) + """)
-        bucket = """ + str(NUM_BUCKETS) + """ - 1;   // clamp
-
-    u64 *val = addr_hist.lookup(&bucket);
-    if (val)
-        __sync_fetch_and_add(val, 1);
-
-    return 0;
-}
-"""
-
-b = BPF(text=prog)
-b.attach_kprobe(event="handle_mm_fault", fn_name="probe_handle_mm_fault")
-
-print("Tracing... Ctrl-C to stop.")
-
-# Procure and return the histogram
-def print_linear_hist():
-    # print("---- Linear VA Fault Histogram ----")
-    arr = b.get_table("addr_hist")
-
-    res = []
-
-    for i, v in arr.items():
-        count = v.value
-        if count == 0:
-            continue
-
-        start = i.value * BUCKET_SIZE
-        end = start + BUCKET_SIZE - 1
-
-        # print("%#16x - %#16x : %d" % (start, end, count))
-
-        res.append((start, end, count))
-    arr.clear()
-
-    return res
-
-# Convert the histogram, (start, end, count), into a flat histogram with implicitly defined ranges as indices.
-def get_bucket_info(val):
-    res = [0] * NUM_BUCKETS
-    for input in val:
-        bucket_index = input[0] >> BUCKET_SHIFT
-
-        res[bucket_index] = input[2]
-    return res
-
-# Constants and globals
-
-prior_transition_array = None
+import histograms as hists
 
 # Runner -- periodically procure a histogram and do updates
 if __name__ == "__main__":
@@ -105,8 +31,10 @@ if __name__ == "__main__":
         START = time.perf_counter_ns()
 
         # Convert the histogram
-        val = print_linear_hist()
-        bucket_info = get_bucket_info(val)
+        val = hists.print_linear_hist()
+        bucket_info = hists.get_bucket_info(val)
+
+        print("FAULT HIST", bucket_info)
 
 
         # do profiling here

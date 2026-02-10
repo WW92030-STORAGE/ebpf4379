@@ -1,5 +1,9 @@
 from bcc import BPF
 from CONSTANTS import BUCKET_ORDER, BUCKET_SHIFT, BUCKET_SIZE, NUM_BUCKETS
+from time import sleep
+import time
+
+# FAULT HISTOGRAM
 
 fault_histogram_program = """
 #include <uapi/linux/ptrace.h>
@@ -26,14 +30,50 @@ int probe_handle_mm_fault(struct pt_regs *ctx)
 fault_b = BPF(text=fault_histogram_program)
 fault_b.attach_kprobe(event="handle_mm_fault", fn_name="probe_handle_mm_fault")
 
-# Procure and return the histogram
+# PROMOTION HISTOGRAM
+
+
+promotion_histogram_program = """
+#include <uapi/linux/ptrace.h>
+#include <linux/mm.h>
+
+BPF_ARRAY(addr_hist, u64, """ + str(NUM_BUCKETS) + """);
+
+int probe_create_huge_pmd(struct pt_regs *ctx)
+{
+    struct vm_fault* vmf;
+
+    unsigned long addr = 0;
+    
+    vmf = (struct vm_fault *)PT_REGS_PARM1(ctx);
+    bpf_probe_read_kernel(&addr, sizeof(addr), &vmf->address);
+
+    u64 bucket = addr >> """ + str(BUCKET_SHIFT) + """;
+
+    if (bucket >= """ + str(NUM_BUCKETS) + """)
+        bucket = """ + str(NUM_BUCKETS) + """ - 1;   // clamp
+
+    u64 *val = addr_hist.lookup(&bucket);
+    if (val)
+        __sync_fetch_and_add(val, 1);
+
+    return 0;
+}
+"""
+
+promo_b = BPF(text=promotion_histogram_program)
+promo_b.attach_kprobe(event="create_huge_pmd", fn_name="probe_create_huge_pmd")
+
+# Procure and return the histograms
 def print_linear_hist(clear_hist = True):
     # print("---- Linear VA Fault Histogram ----")
-    arr = fault_b.get_table("addr_hist")
+    fault_arr = fault_b.get_table("addr_hist")
+    promo_arr = promo_b.get_table("addr_hist")
 
-    res = []
+    fault_res = []
+    promo_res = []
 
-    for i, v in arr.items():
+    for i, v in fault_arr.items():
         count = v.value
         if count == 0:
             continue
@@ -43,11 +83,23 @@ def print_linear_hist(clear_hist = True):
 
         # print("%#16x - %#16x : %d" % (start, end, count))
 
-        res.append((start, end, count))
-    if clear_hist:
-        arr.clear()
+        fault_res.append((start, end, count))
+    for i, v in promo_arr.items():
+        count = v.value
+        if count == 0:
+            continue
 
-    return res
+        start = i.value * BUCKET_SIZE
+        end = start + BUCKET_SIZE - 1
+
+        # print("%#16x - %#16x : %d" % (start, end, count))
+
+        promo_res.append((start, end, count))
+    if clear_hist:
+        fault_arr.clear()
+        promo_arr.clear()
+
+    return fault_res, promo_res
 
 # Convert the histogram, (start, end, count), into a flat histogram with implicitly defined ranges as indices.
 def get_bucket_info(val):
@@ -57,8 +109,6 @@ def get_bucket_info(val):
 
         res[bucket_index] = input[2]
     return res
-
-
 
 # Constants and globals
 
@@ -86,10 +136,12 @@ if __name__ == "__main__":
         START = time.perf_counter_ns()
 
         # Convert the histogram
-        val = print_linear_hist()
-        bucket_info = get_bucket_info(val)
+        fault, promo = print_linear_hist()
+        fault_bi = get_bucket_info(fault)
+        promo_bi = get_bucket_info(promo)
 
-        print("HISTOGRAM", bucket_info)
+        print("FF", fault_bi)
+        print("PP", promo_bi)
 
 
         # do profiling here
