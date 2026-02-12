@@ -112,6 +112,7 @@ def get_bucket_info(val):
 
 # Constants and globals
 
+# Transition array: [AAccesses, FFaults, PPromotions]
 prior_transition_array = None
 
 # Runner -- periodically procure a histogram and do updates
@@ -140,13 +141,24 @@ if __name__ == "__main__":
         fault_bi = get_bucket_info(fault)
         promo_bi = get_bucket_info(promo)
 
-        print("FF", fault_bi)
-        print("PP", promo_bi)
+        print("FF", [str(i) + ": " + str(fault_bi[i]) + " | " for i in range(len(fault_bi)) if fault_bi[i] != 0])
+        print("PP", [str(i) + ": " + str(promo_bi[i]) + " | " for i in range(len(promo_bi)) if promo_bi[i] != 0])
 
 
         # do profiling here
+
+
 
         
         END = time.perf_counter_ns()
         ELAPSED_NS = END - START
         print("FULL MS:", ELAPSED_NS * 0.000001)
+
+
+"""
+
+WHAT WE WANT
+
+More promotions implies: 1. Less faults 2. More accesses
+
+"""

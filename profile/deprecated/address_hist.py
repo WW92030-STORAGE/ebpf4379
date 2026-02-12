@@ -32,7 +32,7 @@ if __name__ == "__main__":
     UB/LB - Attempts to change benefits to outside this range are ignored.
 
     """
-    PERIOD = 16
+    PERIOD = 4
     FIXED_VALUES = False
     PARALLEL = True
     NUM_THREADS = 4

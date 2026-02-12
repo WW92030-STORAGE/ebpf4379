@@ -2,19 +2,23 @@
 
 sudo python3 init_values.py
 
-echo "BENEFITS RESET"
+echo "VALUES RESET"
 
-#!/usr/bin/env bash
-set -euo pipefail
+sudo python3 histograms.py 1>/dev/null 2>/dev/null & 
+PID=$!
 
-setsid sudo python3 address_hist.py &
-FOREVER_PID=$!
+echo "Histogram updater: $PID" 
 
-cd .. &
 
-sudo python3 tester.py &
-TERM_PID=$!
+# do stuff here
+cd ..
+./mongobench_run.sh & 
+PID2=$!
 
-wait "$TERM_PID"
+echo "Workflow: $PID"
 
-kill -- -"$FOREVER_PID"
+wait $PID2
+
+echo "DONE"
+
+kill $PID

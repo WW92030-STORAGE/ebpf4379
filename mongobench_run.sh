@@ -11,3 +11,6 @@ cd mongodb-benchmarking
 ./mongo-bench -threads $NTHREADS -docs $NDOCS -uri mongodb://localhost:27017 -type delete
 
 echo "MONGODB WORKFLOW DONE"
+
+
+# look at the pid

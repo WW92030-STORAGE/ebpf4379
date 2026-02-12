@@ -1,4 +1,4 @@
-import subprocess
+import subprocess, math
 
 VA_ORDER = 48       # How many bits does the address space occupy?
 
@@ -32,6 +32,11 @@ def set_all_zeros(BUCKET_ORDER = CONSTANTS.BUCKET_ORDER, benefit = 200000):
         # set the benefit
         cmd = "echo \"%d %d\" | sudo tee /proc/set_benefits" % (i, benefit)
         exec_(cmd)
+
+        if i % int(math.sqrt(NUM_BUCKETS)) == 0:
+            print("INIT VALUE ... " + str(i) + "/" + str(NUM_BUCKETS))
+    
+    print("INIT DONE")
 
 
 if __name__ == "__main__":
