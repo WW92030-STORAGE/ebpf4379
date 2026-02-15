@@ -2,6 +2,7 @@ from bcc import BPF
 from CONSTANTS import BUCKET_ORDER, BUCKET_SHIFT, BUCKET_SIZE, NUM_BUCKETS
 from time import sleep
 import time
+import argparse
 
 # FAULT HISTOGRAM
 
@@ -131,8 +132,21 @@ if __name__ == "__main__":
     PARALLEL = True
     NUM_THREADS = 4
     TRADE_VALUE = 10000
+
+    parser = argparse.ArgumentParser(description = "put pid here")
+    parser.add_argument('--workflow', type=str, default = "")
+
+    args = parser.parse_args()
+    workflow_pid = args.workflow
+
+    print("PID:", workflow_pid)
+
     while True:
+        # Begoin damo record
+
         sleep(PERIOD)
+
+        # End damo record
 
         START = time.perf_counter_ns()
 

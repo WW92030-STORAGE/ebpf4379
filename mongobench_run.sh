@@ -2,6 +2,7 @@
 
 NTHREADS=16
 NDOCS=1048576
+NDOCS=65535
 
 cd mongodb-benchmarking
 
