@@ -1,0 +1,332 @@
+[
+    {
+        "time": 1771482180.1325374,
+        "footprints": [
+            {
+                "pid": null,
+                "footprint": {
+                    "total": 131718260,
+                    "free": 128840780,
+                    "available": 129086044,
+                    "buffers": 175580,
+                    "cached": 795460
+                }
+            }
+        ]
+    },
+    {
+        "time": 1771482181.1335032,
+        "footprints": [
+            {
+                "pid": null,
+                "footprint": {
+                    "total": 131718260,
+                    "free": 128770420,
+                    "available": 129013560,
+                    "buffers": 175588,
+                    "cached": 793516
+                }
+            }
+        ]
+    },
+    {
+        "time": 1771482182.1343677,
+        "footprints": [
+            {
+                "pid": null,
+                "footprint": {
+                    "total": 131718260,
+                    "free": 128774696,
+                    "available": 129017928,
+                    "buffers": 175588,
+                    "cached": 793516
+                }
+            }
+        ]
+    },
+    {
+        "time": 1771482183.1352046,
+        "footprints": [
+            {
+                "pid": null,
+                "footprint": {
+                    "total": 131718260,
+                    "free": 128780564,
+                    "available": 129023884,
+                    "buffers": 175600,
+                    "cached": 793516
+                }
+            }
+        ]
+    },
+    {
+        "time": 1771482184.1359918,
+        "footprints": [
+            {
+                "pid": null,
+                "footprint": {
+                    "total": 131718260,
+                    "free": 128779524,
+                    "available": 129022848,
+                    "buffers": 175600,
+                    "cached": 793516
+                }
+            }
+        ]
+    },
+    {
+        "time": 1771482185.1368272,
+        "footprints": [
+            {
+                "pid": null,
+                "footprint": {
+                    "total": 131718260,
+                    "free": 128787632,
+                    "available": 129030956,
+                    "buffers": 175600,
+                    "cached": 793516
+                }
+            }
+        ]
+    },
+    {
+        "time": 1771482186.1376686,
+        "footprints": [
+            {
+                "pid": null,
+                "footprint": {
+                    "total": 131718260,
+                    "free": 128789332,
+                    "available": 129032656,
+                    "buffers": 175600,
+                    "cached": 793516
+                }
+            }
+        ]
+    },
+    {
+        "time": 1771482187.138496,
+        "footprints": [
+            {
+                "pid": null,
+                "footprint": {
+                    "total": 131718260,
+                    "free": 128796576,
+                    "available": 129039900,
+                    "buffers": 175600,
+                    "cached": 793516
+                }
+            }
+        ]
+    },
+    {
+        "time": 1771482188.1392806,
+        "footprints": [
+            {
+                "pid": null,
+                "footprint": {
+                    "total": 131718260,
+                    "free": 128809112,
+                    "available": 129052436,
+                    "buffers": 175608,
+                    "cached": 793516
+                }
+            }
+        ]
+    },
+    {
+        "time": 1771482189.1401598,
+        "footprints": [
+            {
+                "pid": null,
+                "footprint": {
+                    "total": 131718260,
+                    "free": 128818184,
+                    "available": 129061516,
+                    "buffers": 175608,
+                    "cached": 793516
+                }
+            }
+        ]
+    },
+    {
+        "time": 1771482190.1409855,
+        "footprints": [
+            {
+                "pid": null,
+                "footprint": {
+                    "total": 131718260,
+                    "free": 128829308,
+                    "available": 129072640,
+                    "buffers": 175608,
+                    "cached": 793516
+                }
+            }
+        ]
+    },
+    {
+        "time": 1771482191.1417966,
+        "footprints": [
+            {
+                "pid": null,
+                "footprint": {
+                    "total": 131718260,
+                    "free": 128836348,
+                    "available": 129079680,
+                    "buffers": 175608,
+                    "cached": 793516
+                }
+            }
+        ]
+    },
+    {
+        "time": 1771482192.1426425,
+        "footprints": [
+            {
+                "pid": null,
+                "footprint": {
+                    "total": 131718260,
+                    "free": 128843796,
+                    "available": 129087128,
+                    "buffers": 175608,
+                    "cached": 793516
+                }
+            }
+        ]
+    },
+    {
+        "time": 1771482193.1434908,
+        "footprints": [
+            {
+                "pid": null,
+                "footprint": {
+                    "total": 131718260,
+                    "free": 128847880,
+                    "available": 129091212,
+                    "buffers": 175608,
+                    "cached": 793516
+                }
+            }
+        ]
+    },
+    {
+        "time": 1771482194.1442807,
+        "footprints": [
+            {
+                "pid": null,
+                "footprint": {
+                    "total": 131718260,
+                    "free": 128850452,
+                    "available": 129093784,
+                    "buffers": 175616,
+                    "cached": 793516
+                }
+            }
+        ]
+    },
+    {
+        "time": 1771482195.1451042,
+        "footprints": [
+            {
+                "pid": null,
+                "footprint": {
+                    "total": 131718260,
+                    "free": 128858096,
+                    "available": 129101428,
+                    "buffers": 175616,
+                    "cached": 793516
+                }
+            }
+        ]
+    },
+    {
+        "time": 1771482196.1459553,
+        "footprints": [
+            {
+                "pid": null,
+                "footprint": {
+                    "total": 131718260,
+                    "free": 128858348,
+                    "available": 129101680,
+                    "buffers": 175616,
+                    "cached": 793516
+                }
+            }
+        ]
+    },
+    {
+        "time": 1771482197.1467607,
+        "footprints": [
+            {
+                "pid": null,
+                "footprint": {
+                    "total": 131718260,
+                    "free": 128865396,
+                    "available": 129108728,
+                    "buffers": 175616,
+                    "cached": 793516
+                }
+            }
+        ]
+    },
+    {
+        "time": 1771482198.1475556,
+        "footprints": [
+            {
+                "pid": null,
+                "footprint": {
+                    "total": 131718260,
+                    "free": 128871856,
+                    "available": 129115188,
+                    "buffers": 175616,
+                    "cached": 793516
+                }
+            }
+        ]
+    },
+    {
+        "time": 1771482199.1483817,
+        "footprints": [
+            {
+                "pid": null,
+                "footprint": {
+                    "total": 131718260,
+                    "free": 128871856,
+                    "available": 129115188,
+                    "buffers": 175624,
+                    "cached": 793516
+                }
+            }
+        ]
+    },
+    {
+        "time": 1771482200.1492212,
+        "footprints": [
+            {
+                "pid": null,
+                "footprint": {
+                    "total": 131718260,
+                    "free": 128879468,
+                    "available": 129122816,
+                    "buffers": 175624,
+                    "cached": 793516
+                }
+            }
+        ]
+    },
+    {
+        "time": 1771482201.150077,
+        "footprints": [
+            {
+                "pid": null,
+                "footprint": {
+                    "total": 131718260,
+                    "free": 128880628,
+                    "available": 129123976,
+                    "buffers": 175624,
+                    "cached": 793516
+                }
+            }
+        ]
+    }
+]
