@@ -2,7 +2,7 @@ from bcc import BPF
 from CONSTANTS import BUCKET_ORDER, BUCKET_SHIFT, BUCKET_SIZE, NUM_BUCKETS
 from time import sleep
 import time
-import argparse
+import argparse, subprocess, atexit
 
 # FAULT HISTOGRAM
 
@@ -116,6 +116,9 @@ def get_bucket_info(val):
 # Transition array: [AAccesses, FFaults, PPromotions]
 prior_transition_array = None
 
+
+perf_rec = None
+
 # Runner -- periodically procure a histogram and do updates
 if __name__ == "__main__":
     """
@@ -127,7 +130,7 @@ if __name__ == "__main__":
     UB/LB - Attempts to change benefits to outside this range are ignored.
 
     """
-    PERIOD = 4
+    PERIOD = 2
     FIXED_VALUES = False
     PARALLEL = True
     NUM_THREADS = 4
@@ -158,7 +161,6 @@ if __name__ == "__main__":
         print("FF", [str(i) + ": " + str(fault_bi[i]) + " | " for i in range(len(fault_bi)) if fault_bi[i] != 0])
         print("PP", [str(i) + ": " + str(promo_bi[i]) + " | " for i in range(len(promo_bi)) if promo_bi[i] != 0])
 
-
         # do profiling here
 
 
@@ -169,6 +171,7 @@ if __name__ == "__main__":
         print("FULL MS:", ELAPSED_NS * 0.000001)
 
 
+
 """
 
 WHAT WE WANT
@@ -176,3 +179,14 @@ WHAT WE WANT
 More promotions implies: 1. Less faults 2. More accesses
 
 """
+
+def goodbye():
+    global perf_rec
+    print("HISTOGRAM TERMINATED")
+    if perf_rec:
+        perf_rec.terminate()
+
+def exit_handler():
+    goodbye()
+
+atexit.register(exit_handler)

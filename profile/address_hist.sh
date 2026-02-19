@@ -2,6 +2,10 @@
 
 echo "VALUES RESET"
 
+sudo rm perf.data
+sudo rm perf.data.old
+perf buildid-cache --purge-all
+
 
 # do stuff here
 cd ..
@@ -22,3 +26,6 @@ wait $PID2
 echo "DONE"
 
 sudo kill $PID
+wait $PID
+
+echo "FIN"

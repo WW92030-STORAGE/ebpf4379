@@ -1,0 +1,17 @@
+ops: vaddr
+
+targets:
+  - pid: all
+
+regions:
+  - start: 0x0
+    end: 0x800000000000   # entire userspace canonical range
+
+intervals:
+  sample_us: 5000        # 5 ms sampling
+  aggr_us:   100000      # 100 ms aggregation
+  update_us: 1000000     # region adaptation period
+
+nr_regions:
+  min: 10
+  max: 1000
