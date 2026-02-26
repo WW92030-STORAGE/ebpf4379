@@ -125,11 +125,13 @@ prior_promo_bi = [0] * NUM_BUCKETS
 
 fault_decrease_numerator = 0
 fault_decrease_denominator = 0
+fdn_histo = [0] * NUM_BUCKETS
+fdd_histo = [0] * NUM_BUCKETS
 
 
 perf_rec = None
 
-UPDATE_HISTOS = True
+UPDATE_HISTOS = False
 
 # Runner -- periodically procure a histogram and do updates
 if __name__ == "__main__":
@@ -233,8 +235,10 @@ if __name__ == "__main__":
         for i in range(NUM_BUCKETS):
             if prior_promo_bi[i] > 0:
                 fault_decrease_denominator += 1
+                fdd_histo[i] += 1
                 if fault_bi[i] < prior_fault_bi[i]:
                     fault_decrease_numerator += 1
+                    fdn_histo[i] += 1
 
         
         prior_fault_bi = [i for i in fault_bi]
@@ -250,7 +254,9 @@ if __name__ == "__main__":
         if fault_decrease_denominator > 0:
             print("FAULT DECREASE RATE: " + str(fault_decrease_numerator / fault_decrease_denominator))
 
-                
+        print("FD", [str(i) + ": " + f"{(fdn_histo[i] / fdd_histo[i]):.4f}" + " | " for i in range(len(fdd_histo)) if fdd_histo[i] != 0])
+
+        print("------------\n\n------------")
 
                 
 
