@@ -288,7 +288,7 @@ if __name__ == "__main__":
                 prior_histograms = prior_histograms[1:]
                 for i in range(NUM_BUCKETS):
                     prior_transition_array[i] -= ph[i]
-            if MODE == "radicalist" or MODE == "progressive":
+            if MODE == "radicalist" or MODE == "progressive" or MODE == "adversarial":
 
 
                 if MODE == "radicalist":
@@ -306,15 +306,31 @@ if __name__ == "__main__":
                         for i in range(start_val, NUM_BUCKETS, step):
                             diff = prior_transition_array[i] - pta[i]
 
-                            # diff = math.sqrt(diff)
+                            # diff = (1 if diff >= 0 else -1) * math.sqrt(abs(diff))
 
                             diff = int(diff)
                             if diff != 0 and abs(diff) >= THRESHOLD:
-                                cmd = "echo \"%d %d %d\" | sudo tee /proc/increase_benefits" % (i, abs(diff), diff >= 0)
+                                cmd = "echo \"%d %d %d\" | sudo tee /proc/increase_benefits" % (i, abs(diff), 1 if diff >= 0 else 0)
                                 exec_(cmd)    
                     with CF.ThreadPoolExecutor(max_workers=NUM_THREADS) as executor:
                         for i in range(NUM_THREADS):
-                            executor.submit(modify_progressive, i, NUM_THREADS)                       
+                            executor.submit(modify_progressive, i, NUM_THREADS)    
+                if MODE == "adversarial":
+                    def modify_adversarial(start_val, step):
+                        for i in range(start_val, NUM_BUCKETS, step):
+                            diff = prior_transition_array[i] - pta[i]
+
+                            # diff = (1 if diff >= 0 else -1) * math.sqrt(abs(diff))
+
+                            diff = int(diff)
+                            if diff != 0 and abs(diff) >= THRESHOLD:
+                                cmd = "echo \"%d %d %d\" | sudo tee /proc/increase_benefits" % (i, abs(diff), 1 if diff <= 0 else 0)
+                                exec_(cmd)   
+                    if len(prior_histograms) < RUNNING_WINDOW:
+                        continue 
+                    with CF.ThreadPoolExecutor(max_workers=NUM_THREADS) as executor:
+                        for i in range(NUM_THREADS):
+                            executor.submit(modify_adversarial, i, NUM_THREADS)   
 
             elif MODE == "capitalist":
                 if prior_transition_array is None:
@@ -396,6 +412,16 @@ def goodbye():
     if perf_rec:
         perf_rec.terminate()
 
+    print("FAULT DECREASE RATE:", str(fault_decrease_numerator / fault_decrease_denominator))
+    print()
+
+    with open('LOG.txt', 'a') as f:
+        lines = [
+            "HISTOGRAM TERMINATED",
+            "FAULT DECREASE RATE:" + str(fault_decrease_numerator / fault_decrease_denominator), 
+            "FD" + str([str(i) + ": " + f"{(fdn_histo[i] / fdd_histo[i]):.4f}" + " | " for i in range(len(fdd_histo)) if fdd_histo[i] != 0])
+        ]
+        f.writeLines(lines)
 def exit_handler():
     goodbye()
 
