@@ -59,10 +59,11 @@ def run_test(CMD):
 
 
 def run_tests(CMD):
-    WARMUP_CNT = 1
-    TEST_CNT = 2
+    WARMUP_CNT = 4
+    TEST_CNT = 32
 
     ELAPSED_NS = 0
+    AVG_RATE = 0
     DATA = []
     RATE = []
 
@@ -74,6 +75,7 @@ def run_tests(CMD):
         value, throughput = run_test(CMD)
         ELAPSED_NS += value
         DATA.append(value)
+        AVG_RATE += throughput
         RATE.append(throughput)
         print(str(i + 1) + "/" + str(TEST_CNT) + " DONE...")
         if len(DATA):
@@ -81,15 +83,17 @@ def run_tests(CMD):
         time.sleep(1)
 
     ELAPSED_NS /= TEST_CNT
+    AVG_RATE /= TEST_CNT
 
 
     print("AVG ELAPSED: " + str(ELAPSED_NS) + "ns")
     print("AVG ELAPSED: " + str(ELAPSED_NS * 0.001) + "us")
     print("AVG ELAPSED: " + str(ELAPSED_NS * 0.001 * 0.001) + "ms")
-    print("DATA", str(DATA))
+    # print("DATA", str(DATA))
     for data in DATA:
         print(data)
-    print("RATE" + str(RATE) + "\n")
+    print("AVG_RATE: " + str(AVG_RATE) + "ops/s")
+    # print("RATE" + str(RATE) + "\n")
     for i in RATE:
         print(str(i))
 
@@ -100,9 +104,10 @@ def run_tests(CMD):
         FF.write("DATA" + str(DATA) + "\n")
         for i in DATA:
             FF.write(str(data) + "\n")
+        FF.write("AVG_RATE: " + str(AVG_RATE) + "ops/s")
         FF.write("RATE" + str(RATE) + "\n")
         for i in RATE:
-            FF.write(str(i))
+            FF.write(str(i) + "\n")
 
 if __name__ == "__main__":
     try:
