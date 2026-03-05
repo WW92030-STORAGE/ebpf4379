@@ -1,7 +1,8 @@
 #!/bin/bash
 
-# https://github.com/ctch3ng/Installing-Python-2.7-and-pip-on-Ubuntu-24.04-Noble-LTS
 
+# https://github.com/ctch3ng/Installing-Python-2.7-and-pip-on-Ubuntu-24.04-Noble-LTS
+sudo apt install -y default-jdk
 sudo apt install -y build-essential checkinstall libncurses-dev libssl-dev libsqlite3-dev tk-dev libgdbm-dev libc6-dev libbz2-dev libffi-dev libreadline-dev libdb-dev
 
 cd /usr/src

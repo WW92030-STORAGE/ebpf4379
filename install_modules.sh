@@ -47,5 +47,11 @@ make
 sudo insmod getbenefits_mod.ko
 make clean
 
+# /proc/scale_benefits
+cd ../scalebenefits_mod
+make
+sudo insmod scalebenefits_mod.ko
+make clean
+
 
 # echo ? ? | sudo tee /proc/set_???
