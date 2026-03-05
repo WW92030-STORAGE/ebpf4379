@@ -229,7 +229,7 @@ if __name__ == "__main__":
     NUM_THREADS = 4
     TRADE_VALUE = 10000
     THRESHOLD = 0
-    MODE = "progressive"
+    MODE = "radicalist"
 
     parser = argparse.ArgumentParser(description = "put pid here")
     parser.add_argument('--workflow', type=str, default = "")
@@ -292,15 +292,19 @@ if __name__ == "__main__":
 
 
                 if MODE == "radicalist":
-                    for i in range(NUM_BUCKETS):
-                        # increasing in faults
-                        # print(pta[i], prior_transition_array[i])
-                        if prior_transition_array[i] > pta[i] + THRESHOLD:
-                            cmd = "echo \"%d %d\" | sudo tee /proc/set_benefits" % (i, 400000)
-                            exec_(cmd)
-                        elif prior_transition_array[i] < pta[i] - THRESHOLD:
-                            cmd = "echo \"%d %d\" | sudo tee /proc/set_benefits" % (i, 100000)
-                            exec_(cmd)
+                    def modify_radicalist(start_val, step):
+                        for i in range(start_val, NUM_BUCKETS, step):
+                            # increasing in faults
+                            # print(pta[i], prior_transition_array[i])
+                            if prior_transition_array[i] > pta[i] + THRESHOLD:
+                                cmd = "echo \"%d %d\" | sudo tee /proc/set_benefits" % (i, 400000)
+                                exec_(cmd)
+                            elif prior_transition_array[i] < pta[i] - THRESHOLD:
+                                cmd = "echo \"%d %d\" | sudo tee /proc/set_benefits" % (i, 100000)
+                                exec_(cmd)
+                    with CF.ThreadPoolExecutor(max_workers=NUM_THREADS) as executor:
+                        for i in range(NUM_THREADS):
+                            executor.submit(modify_radicalist, i, NUM_THREADS) 
                 if MODE == "progressive":
                     def modify_progressive(start_val, step):
                         for i in range(start_val, NUM_BUCKETS, step):
@@ -319,6 +323,8 @@ if __name__ == "__main__":
                     def modify_inverted_progressive(start_val, step):
                         for i in range(start_val, NUM_BUCKETS, step):
                             diff = prior_transition_array[i] - pta[i]
+
+                            # FDR = (fdn_histo[i] / fdd_histo[i]) if (fdd_histo[i] != 0) else 0
 
                             # diff = (1 if diff >= 0 else -1) * math.sqrt(abs(diff))
 

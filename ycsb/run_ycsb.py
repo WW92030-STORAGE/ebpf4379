@@ -10,7 +10,8 @@ def exec_(cmd):
     check=True # Optional: raise an exception if the command fails
     ).stdout
 
-def run_test(CMD):
+def run_test(PRELUDE, CMD):
+    exec_(PRELUDE)
 
     START = time.perf_counter_ns()
     END = None
@@ -58,9 +59,9 @@ def run_test(CMD):
     return ELAPSED_NS, RATE
 
 
-def run_tests(CMD):
-    WARMUP_CNT = 4
-    TEST_CNT = 32
+def run_tests(PRELUDE, CMD):
+    WARMUP_CNT = 0
+    TEST_CNT = 1
 
     ELAPSED_NS = 0
     AVG_RATE = 0
@@ -68,11 +69,12 @@ def run_tests(CMD):
     RATE = []
 
     for i in range(WARMUP_CNT):
-        run_test(CMD)
+
+        run_test(PRELUDE, CMD)
         time.sleep(1)
 
     for i in range(TEST_CNT):
-        value, throughput = run_test(CMD)
+        value, throughput = run_test(PRELUDE, CMD)
         ELAPSED_NS += value
         DATA.append(value)
         AVG_RATE += throughput
@@ -110,11 +112,7 @@ def run_tests(CMD):
             FF.write(str(i) + "\n")
 
 if __name__ == "__main__":
-    try:
-        exec_("sudo ./install_workload.sh")
-    except Exception:
-        pass
-    run_tests("./run_tests.sh")
+    run_tests("./install_workload.sh", "./run_tests.sh")
 
 
 # WARNING - DO NOT RUN THIS AS ROOT

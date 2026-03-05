@@ -1,0 +1,1 @@
+./install_mongo4.sh  && ./install_python.sh && ./run_mongo4.sh && ./install_workload.sh
