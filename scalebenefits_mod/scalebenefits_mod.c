@@ -30,14 +30,14 @@ static ssize_t proc_write(struct file *file,
 
     /* Expect: "index value" */
     if (sscanf(buf, "%llu %llu %llu", &index, &num, &denom) != 3) {
-        pr_info("increase_benefits: expected \"<index> <value> <positive>\"\n");
+        pr_info("scale_benefits: expected \"<index> <value> <positive>\"\n");
         return -EINVAL;
     }
 
     /* Call into your kernel code */
-    INCREASE_BENEFITS(index, val, denom);
+    SCALE_BENEFITS(index, num, denom);
 
-    pr_info("scale_benefits: INCREASE_BENEFITS(%llu, %llu, %llu)\n", index, num, denom);
+    pr_info("scale_benefits: SCALE_BENEFITS(%llu, %llu, %llu)\n", index, num, denom);
 
     return count;
 }
