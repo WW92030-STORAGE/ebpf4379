@@ -229,7 +229,7 @@ if __name__ == "__main__":
     NUM_THREADS = 4
     TRADE_VALUE = 10000
     THRESHOLD = 0
-    MODE = "radicalist"
+    MODE = "progressive3"
 
     parser = argparse.ArgumentParser(description = "put pid here")
     parser.add_argument('--workflow', type=str, default = "")
@@ -292,6 +292,8 @@ if __name__ == "__main__":
 
 
                 if MODE == "radicalist":
+                    if len(prior_histograms) < RUNNING_WINDOW:
+                        continue
                     def modify_radicalist(start_val, step):
                         for i in range(start_val, NUM_BUCKETS, step):
                             # increasing in faults
@@ -306,6 +308,8 @@ if __name__ == "__main__":
                         for i in range(NUM_THREADS):
                             executor.submit(modify_radicalist, i, NUM_THREADS) 
                 if MODE == "progressive":
+                    if len(prior_histograms) < RUNNING_WINDOW:
+                        continue
                     def modify_progressive(start_val, step):
                         for i in range(start_val, NUM_BUCKETS, step):
                             diff = prior_transition_array[i] - pta[i]
@@ -320,6 +324,8 @@ if __name__ == "__main__":
                         for i in range(NUM_THREADS):
                             executor.submit(modify_progressive, i, NUM_THREADS)    
                 if MODE == "inverted_progressive":
+                    if len(prior_histograms) < RUNNING_WINDOW:
+                        continue
                     def modify_inverted_progressive(start_val, step):
                         for i in range(start_val, NUM_BUCKETS, step):
                             diff = prior_transition_array[i] - pta[i]
@@ -338,7 +344,7 @@ if __name__ == "__main__":
                         for i in range(NUM_THREADS):
                             executor.submit(modify_inverted_progressive, i, NUM_THREADS)   
 
-            elif MODE == "capitalist":
+            elif MODE == "progressive2" or MODE == "progressive3":
                 if prior_transition_array is None:
                     prior_transition_array = [0] * NUM_BUCKETS
                 if prior_histograms is None:
@@ -346,7 +352,7 @@ if __name__ == "__main__":
 
                 pta = [i for i in prior_transition_array]
                 
-                RUNNING_WINDOW = 1
+                RUNNING_WINDOW = 8
                 prior_histograms.append(fault_bi)
                 for i in range(NUM_BUCKETS):
                     prior_transition_array[i] += fault_bi[i]
@@ -357,18 +363,49 @@ if __name__ == "__main__":
 
                     for i in range(NUM_BUCKETS):
                         prior_transition_array[i] -= ph[i]
+                
+                if MODE == "progressive2":
+                    if len(prior_histograms) < RUNNING_WINDOW:
+                        continue
+                    def modify_progressive2(start_val, step):
+                        for i in range(start_val, NUM_BUCKETS, step):
+                            diff = prior_transition_array[i] - pta[i]
+                            FDN = fdn_histo[i]
+                            FDD = fdd_histo[i]
+    
+                            diff = int(diff)
 
-                def modify_capitalist(start_val, step):
-                    for i in range(start_val, NUM_BUCKETS, step):
-                        if (prior_promo_bi[i] > 0) == (prior_transition_array[i] > pta[i]):
-                            cmd = "echo \"%d %d\" | sudo tee /proc/set_benefits" % (i, 100000)
-                            exec_(cmd)
-                        else:
-                            cmd = "echo \"%d %d\" | sudo tee /proc/set_benefits" % (i, 400000)
-                            exec_(cmd)
-                with CF.ThreadPoolExecutor(max_workers=NUM_THREADS) as executor:
-                    for i in range(NUM_THREADS):
-                        executor.submit(modify_capitalist, i, NUM_THREADS)
+                            if FDD != 0:
+                                num = FDN
+                                denom = FDD - FDN
+                                reduced_diff = 1 + abs(diff)
+                                if (num < denom):
+                                    denom = int(denom * reduced_diff)
+                                else:
+                                    num = int(num * reduced_diff)
+                                cmd = "echo %d %d %d | sudo tee /proc/scale_benefits" % (i, num, denom)
+                                exec_(cmd)
+                            elif diff != 0 and abs(diff) >= THRESHOLD:
+                                cmd = "echo \"%d %d %d\" | sudo tee /proc/increase_benefits" % (i, abs(diff), 1 if diff <= 0 else 0)
+                                exec_(cmd)
+
+                    with CF.ThreadPoolExecutor(max_workers=NUM_THREADS) as executor:
+                        for i in range(NUM_THREADS):
+                            executor.submit(modify_progressive2, i, NUM_THREADS)
+                if MODE == "progressive3":
+                    if len(prior_histograms) < RUNNING_WINDOW:
+                        continue
+                    def modify_progressive3(start_val, step):
+                        for i in range(start_val, NUM_BUCKETS, step):
+                            if prior_transition_array[i] == 0:
+                                continue
+                            if prior_transition_array[i] != pta[i]:
+                                cmd = "echo %d %d %d | sudo tee /proc/scale_benefits" % (i, pta[i], prior_transition_array[i])
+                                exec_(cmd)
+
+                    with CF.ThreadPoolExecutor(max_workers=NUM_THREADS) as executor:
+                        for i in range(NUM_THREADS):
+                            executor.submit(modify_progressive3, i, NUM_THREADS)
         # Begin evaluate metrics
 
         for i in range(NUM_BUCKETS):
