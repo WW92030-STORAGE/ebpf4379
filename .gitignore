@@ -13,3 +13,4 @@ profile/VENV/*
 damo/*
 __pycache__/*
 profile/__pycache__/*
+ycsb/mongodb-linux*
