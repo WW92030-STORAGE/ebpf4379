@@ -20,7 +20,7 @@ true_edge_colors = [edge_colors[2], edge_colors[3]]
 
 # String labels
 methods = [
-    "CBMM", "Policy"
+    "CBMM", "CBMM+Guardrail"
 ]
 
 workloads = [
@@ -38,21 +38,19 @@ plt.figure()
 
 fig, ax = plt.subplots()
 
-# Plot bars
 for i in range(num_points):
     offset = (i - num_points / 2) * bar_width + bar_width / 2
     ax.bar(x + offset, data[:, i], width=bar_width, label=methods[i], color = true_colors[i], hatch = true_hatches[i], edgecolor = true_edge_colors[i], yerr = stdevs[:, i], capsize = 4)
 
-# Labels and formatting
+# Labels
 plt.xlabel('Workload (YCSB mongodb)')
 plt.ylabel('Throughput (kOps/s)')
 plt.title('')
 
 plt.xticks(x, workloads)
-plt.tight_layout()
-fig.legend(loc = 'outside upper center')
+fig.legend(frameon=False, loc="upper center", ncol=2, bbox_to_anchor=(0.5, 0.95)) # Might need to change 1.06
+plt.subplots_adjust(top=0.8, bottom=0.2, left=0.2, right=0.95) # Might need to adjust these numbers slightly; don't use tight_layout
 
-plt.tight_layout()
-
+plt.savefig("plot.pdf")
 plt.savefig("plot.png")
 plt.show()
